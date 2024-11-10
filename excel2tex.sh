@@ -1,13 +1,27 @@
 #!/bin/bash
-help() {
-        cat <<EOF
-Usage of excel2tex.sh:
-EOF
-}
 
 SEP="X"
 TITLE="XXXXX"
 N=$1
+
+help() {
+        cat <<EOF
+Usage of excel2tex.sh:
+
+-t, --title:    Set Table's title
+                Default: $TITLE
+-s, --sep:      Set custom "Table Separator" (aka column type in latex)
+                Default is $SEP
+                NOTE: You might also want this in your preamble:
+                \\newcolumntype{L}{>{\\raggedright\\arraybackslash}X}
+                \\newcolumntype{Y}{>{\\centering\\arraybackslash}X}
+-y:             Alias to -s Y
+-n:             Set number of table columns.
+                NOTE: by default uses 1st program argument if no other options specified
+                Default: $N
+-h, --help:     Show this message and exit.
+EOF
+}
 
 while [[ $# -gt 0 ]]; do
   case $1 in
@@ -15,7 +29,7 @@ while [[ $# -gt 0 ]]; do
       SEP="Y"
       shift # past argument
       ;;
-    -s|--separator)
+    -s|--sep)
       SEP="$2"
       shift # past argument
       shift # past value

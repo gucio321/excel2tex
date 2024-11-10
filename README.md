@@ -16,21 +16,19 @@ Optionally to get latest code do `go install github.com/gucio321/excel2tex/v2@la
 ## Command Line Arguments
 
 ```console
-$ excel2tex --help
-Usage of excel2tex.sh:
-
--t, --title:    Set Table's title
-                Default: XXXXX
--s, --sep:      Set custom "Table Separator" (aka column type in latex)
-                Default is X
-                NOTE: You might also want this in your preamble:
-                \newcolumntype{L}{>{\raggedright\arraybackslash}X}
-                \newcolumntype{Y}{>{\centering\arraybackslash}X}
--y:             Alias to -s Y
--n:             Set number of table columns.
-                NOTE: by default uses 1st program argument if no other options specified
-                Default: --help
--h, --help:     Show this message and exit.
+$ excel2tex -h
+2024-11-10 17:04:09	[INFO]:	Welcome to excel2tex
+Usage of excel2tex:
+  -bc
+    	Bold first column.
+  -long
+    	Use longtable instead of table and tabularx (recomended -s c)
+  -nb
+    	Do not bold first row.
+  -s string
+    	Separator for table columns (latex table columns type) (default "X")
+  -t string
+    	Title of the table (default "XXXXX")
 ```
 
 # Legal Notes

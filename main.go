@@ -26,6 +26,7 @@ type Table struct {
 	LatexColumnType string
 	Title           string
 	BoldFirstRow    bool
+	LongTable       bool
 }
 
 func NewTable() *Table {
@@ -59,7 +60,7 @@ CSSRead:
 	return result, nil
 }
 
-func (t *Table) encodeLatexTable() string {
+func (t *Table) EncodeLatexTable() string {
 	rows := t.Rows
 	if t.BoldFirstRow {
 		for i, cell := range rows[0] {
@@ -67,18 +68,15 @@ func (t *Table) encodeLatexTable() string {
 		}
 	}
 
-	rowsStr := &strings.Builder{}
-	for _, row := range rows {
-		for i, cell := range row {
-			fmt.Fprintf(rowsStr, "%s", cell)
-			if i < len(row)-1 {
-				fmt.Fprint(rowsStr, " & ")
-			}
-		}
-
-		fmt.Fprintln(rowsStr, " \\\\ \\hline")
+	if t.LongTable {
+		return t.longTable(rows)
 	}
 
+	return t.normalTable(rows)
+}
+
+// normalTable encodes table with table and tabularx
+func (t *Table) normalTable(rows []Row) string {
 	colTypes := strings.Repeat(fmt.Sprintf("|%s", t.LatexColumnType), len(rows[0]))
 	colTypes += "|"
 
@@ -92,9 +90,66 @@ func (t *Table) encodeLatexTable() string {
 \end{tabularx}
 \end{table}`,
 		t.Title,
-		rowsStr.String(),
-		colTypes,
+		t.mergeRows(rows).String(),
+		t.colTypesStr(),
 	)
+}
+
+// longTable encodes table with table and tabularx
+func (t *Table) longTable(rows []Row) string {
+	return fmt.Sprintf(
+		`\begin{longtable}{%[3]s} %% Column alignment and table borders
+\caption{%[1]s} \\
+
+%% Header for the first page
+\hline
+%%\multicolumn{3}{|c|}{Table Header} \\
+%%\hline
+\endfirsthead
+
+%% Header for subsequent pages
+\hline
+%%\multicolumn{3}{|c|}{Table Header (continued)} \\
+%%\hline
+\endhead
+
+%% Footer for each page
+\hline
+%%\endfoot
+
+%% Footer for the last page
+%%\hline
+%%\endlastfoot
+
+%% Table content
+%[2]s
+\end{longtable}`,
+		t.Title,
+		t.mergeRows(rows).String(),
+		t.colTypesStr(),
+	)
+}
+
+func (t *Table) mergeRows(rows []Row) *strings.Builder {
+	rowsStr := &strings.Builder{}
+	for _, row := range rows {
+		for i, cell := range row {
+			fmt.Fprintf(rowsStr, "%s", cell)
+			if i < len(row)-1 {
+				fmt.Fprint(rowsStr, " & ")
+			}
+		}
+
+		fmt.Fprintln(rowsStr, " \\\\ \\hline")
+	}
+
+	return rowsStr
+}
+
+func (t *Table) colTypesStr() string {
+	colTypes := strings.Repeat(fmt.Sprintf("|%s", t.LatexColumnType), len(t.Rows[0]))
+	colTypes += "|"
+	return colTypes
 }
 
 func main() {
@@ -102,6 +157,7 @@ func main() {
 
 	title := flag.String("t", DefaultTitle, "Title of the table")
 	colType := flag.String("s", DefaultSeparator, "Separator for table columns (latex table columns type)")
+	long := flag.Bool("long", false, "Use longtable instead of table and tabularx (recomended -s c)")
 	flag.Parse()
 	glg.Debug("Parsed flags")
 
@@ -123,9 +179,10 @@ func main() {
 	glg.Debug("Setting properties for internally-processed table")
 	interFormat.Title = *title
 	interFormat.LatexColumnType = *colType
+	interFormat.LongTable = *long
 
 	glg.Debug("Generating latex table")
-	latexTable := interFormat.encodeLatexTable()
+	latexTable := interFormat.EncodeLatexTable()
 	glg.Debug("Writing latex table to clipboard")
 	// a small trick here: wait for data to be writen and then exit
 	go clipboard.Write(clipboard.FmtText, []byte(latexTable))

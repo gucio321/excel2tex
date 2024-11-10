@@ -1,3 +1,26 @@
+# Setup
+
+## Pre-requirements
+
+- Linux system (tested on Arch and Fedora)
+- LibreOffice Calc
+- xclip
+
+## Installation
+
+do this replacing `$HOME/git` with your preffered directory to clone git projects:
+
+```sh
+export MyGitFolder="$HOME/git"
+export MyBinFolder="$HOME/bin"
+cd $MyGitFolder
+git clone https://github.com/gucio321/excel2tex
+cd $MyBinFolder
+ln -s $MyGitFolder/excel2tex/excel2tex.sh excel2tex
+```
+
+:information_source: make sure you have `$HOME/bin` in your `$PATH` variable or change the `$MyBinFolder` to your preffered directory.
+
 # Usage
 
 1. Open LibreOffice Calc

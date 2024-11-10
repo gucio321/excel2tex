@@ -24,10 +24,10 @@ ln -s $MyGitFolder/excel2tex/excel2tex.sh excel2tex
 # Usage
 
 1. Open LibreOffice Calc
-2. Select cells you'd like to put in you latex
+2. Select cells you'd like to put in you latex and Ctrl+C-copy them.
 ![Select cells](./images/select-cells.png)
 3. Run excel2tex script in your terminal (You can specify additional options - see [here](#command-line-arguments)).
-4. Paste the output in your latex document and build it. Adjust title if necessary.
+4. Middle-click-paste the output in your latex document and build it. Adjust title if necessary.
 ![Paste in latex](./images/paste-in-latex.png)
 
 ## Command Line Arguments

@@ -1,33 +1,16 @@
-# Setup
+# Installation
 
-## Pre-requirements
+Download an executable from Releases section and put somewhere on your system (e.g. inside of $pATH).
 
-- Linux system (tested on Arch and Fedora)
-- LibreOffice Calc
-- xclip
-
-## Installation
-
-do this replacing `$HOME/git` with your preffered directory to clone git projects:
-
-```sh
-export MyGitFolder="$HOME/git"
-export MyBinFolder="$HOME/bin"
-cd $MyGitFolder
-git clone https://github.com/gucio321/excel2tex
-cd $MyBinFolder
-ln -s $MyGitFolder/excel2tex/excel2tex.sh excel2tex
-```
-
-:information_source: make sure you have `$HOME/bin` in your `$PATH` variable or change the `$MyBinFolder` to your preffered directory.
+Optionally to get latest code do `go install github.com/gucio321/excel2tex/v2@latest`
 
 # Usage
 
-1. Open LibreOffice Calc
+1. Open LibreOffice Calc or Excel
 2. Select cells you'd like to put in you latex and Ctrl+C-copy them.
 ![Select cells](./images/select-cells.png)
-3. Run excel2tex script in your terminal (You can specify additional options - see [here](#command-line-arguments)).
-4. Middle-click-paste the output in your latex document and build it. Adjust title if necessary.
+3. Run excel2tex programm in your terminal or by double-click on windows (You can specify additional options - see [here](#command-line-arguments)).
+4. Paste the output in your latex document and build it.
 ![Paste in latex](./images/paste-in-latex.png)
 
 ## Command Line Arguments

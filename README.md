@@ -37,4 +37,4 @@ Usage of excel2tex.sh:
 
 :warning: This project is not affiliated with LibreOffice nor Microsoft Excel. It is a personal project made for educational purposes only. Use it at your own risk.
 
-Microsoft and Microsoft Excel is a registered trademark of Microsoft Corporation in the United States and/or other countries.
+Excel is a registered trademark of Microsoft Corporation in the United States and/or other countries.

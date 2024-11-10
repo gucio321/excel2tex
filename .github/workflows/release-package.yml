@@ -20,11 +20,11 @@ jobs:
 
       - name: Build .bin and .exe package
         run: |
-          go build -v -o mati.bin .
-          GOOS="windows" GOARCH="amd64" go build -v -o mati.exe .
+          go build -v -o excel2tex.bin .
+          GOOS="windows" GOARCH="amd64" go build -v -o excel2tex.exe .
 
       - uses: "softprops/action-gh-release@v1"
         with:
           files: |
-            mati.bin
-            mati.exe
+            excel2tex.bin
+            excel2tex.exe

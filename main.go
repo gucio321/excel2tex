@@ -26,6 +26,7 @@ type Table struct {
 	LatexColumnType string
 	Title           string
 	BoldFirstRow    bool
+	BoldFirstColumn bool
 	LongTable       bool
 }
 
@@ -61,23 +62,16 @@ CSSRead:
 }
 
 func (t *Table) EncodeLatexTable() string {
-	rows := t.Rows
-	if t.BoldFirstRow {
-		for i, cell := range rows[0] {
-			rows[0][i] = "\\textbf{" + cell + "}"
-		}
-	}
-
 	if t.LongTable {
-		return t.longTable(rows)
+		return t.longTable()
 	}
 
-	return t.normalTable(rows)
+	return t.normalTable()
 }
 
 // normalTable encodes table with table and tabularx
-func (t *Table) normalTable(rows []Row) string {
-	colTypes := strings.Repeat(fmt.Sprintf("|%s", t.LatexColumnType), len(rows[0]))
+func (t *Table) normalTable() string {
+	colTypes := strings.Repeat(fmt.Sprintf("|%s", t.LatexColumnType), len(t.Rows[0]))
 	colTypes += "|"
 
 	return fmt.Sprintf(
@@ -90,13 +84,13 @@ func (t *Table) normalTable(rows []Row) string {
 \end{tabularx}
 \end{table}`,
 		t.Title,
-		t.mergeRows(rows).String(),
+		t.mergeRows().String(),
 		t.colTypesStr(),
 	)
 }
 
 // longTable encodes table with table and tabularx
-func (t *Table) longTable(rows []Row) string {
+func (t *Table) longTable() string {
 	return fmt.Sprintf(
 		`\begin{longtable}{%[3]s} %% Column alignment and table borders
 \caption{%[1]s} \\
@@ -125,13 +119,33 @@ func (t *Table) longTable(rows []Row) string {
 %[2]s
 \end{longtable}`,
 		t.Title,
-		t.mergeRows(rows).String(),
+		t.mergeRows().String(),
 		t.colTypesStr(),
 	)
 }
 
-func (t *Table) mergeRows(rows []Row) *strings.Builder {
+// rows returns a copy of t.Rows but with applied various modifiers from Table
+func (t *Table) rows() []Row {
+	rows := t.Rows
+	if t.BoldFirstRow {
+		for i, cell := range rows[0] {
+			rows[0][i] = "\\textbf{" + cell + "}"
+		}
+	}
+
+	if t.BoldFirstColumn {
+		for i := 0; i < len(rows); i++ {
+			rows[i][0] = "\\textbf{" + rows[i][0] + "}"
+		}
+	}
+
+	return rows
+}
+
+func (t *Table) mergeRows() *strings.Builder {
 	rowsStr := &strings.Builder{}
+	rows := t.rows()
+
 	for _, row := range rows {
 		for i, cell := range row {
 			fmt.Fprintf(rowsStr, "%s", cell)
@@ -158,6 +172,8 @@ func main() {
 	title := flag.String("t", DefaultTitle, "Title of the table")
 	colType := flag.String("s", DefaultSeparator, "Separator for table columns (latex table columns type)")
 	long := flag.Bool("long", false, "Use longtable instead of table and tabularx (recomended -s c)")
+	noFirstRowBold := flag.Bool("nb", false, "Do not bold first row.")
+	boldFirstColumn := flag.Bool("bc", false, "Bold first column.")
 	flag.Parse()
 	glg.Debug("Parsed flags")
 
@@ -180,6 +196,8 @@ func main() {
 	interFormat.Title = *title
 	interFormat.LatexColumnType = *colType
 	interFormat.LongTable = *long
+	interFormat.BoldFirstRow = !*noFirstRowBold
+	interFormat.BoldFirstColumn = *boldFirstColumn
 
 	glg.Debug("Generating latex table")
 	latexTable := interFormat.EncodeLatexTable()

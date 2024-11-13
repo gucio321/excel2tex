@@ -28,6 +28,8 @@ type Table struct {
 	BoldFirstRow    bool
 	BoldFirstColumn bool
 	LongTable       bool
+	NoPreamble      bool
+	NoPostamble     bool
 }
 
 func NewTable() *Table {
@@ -74,25 +76,36 @@ func (t *Table) normalTable() string {
 	colTypes := strings.Repeat(fmt.Sprintf("|%s", t.LatexColumnType), len(t.Rows[0]))
 	colTypes += "|"
 
-	return fmt.Sprintf(
+	preamble := fmt.Sprintf(
 		`\begin{table}[ht]
 \caption{%[1]s}
 \centering
- \begin{tabularx}{\textwidth}{%[3]s}
+ \begin{tabularx}{\textwidth}{%[2]s}
  \hline 
+ `, t.Title, t.colTypesStr())
+
+	postamble := `\end{tabularx}
+\end{table}`
+
+	if t.NoPreamble {
+		preamble = ""
+	}
+
+	if t.NoPostamble {
+		postamble = ""
+	}
+
+	return fmt.Sprintf(
+		`%[1]s
 %[2]s
-\end{tabularx}
-\end{table}`,
-		t.Title,
-		t.mergeRows().String(),
-		t.colTypesStr(),
+%[3]s`,
+		preamble, t.mergeRows().String(), postamble,
 	)
 }
 
 // longTable encodes table with table and tabularx
 func (t *Table) longTable() string {
-	return fmt.Sprintf(
-		`\begin{longtable}{%[3]s} %% Column alignment and table borders
+	preamble := fmt.Sprintf(`\begin{longtable}{%[2]s} %% Column alignment and table borders
 \caption{%[1]s} \\
 
 %% Header for the first page
@@ -114,13 +127,25 @@ func (t *Table) longTable() string {
 %% Footer for the last page
 %%\hline
 %%\endlastfoot
+`, t.Title, t.colTypesStr())
 
+	postamble := `\end{longtable}`
+
+	if t.NoPreamble {
+		preamble = ""
+	}
+
+	if t.NoPostamble {
+		postamble = ""
+	}
+
+	return fmt.Sprintf(
+		`
+%[1]s
 %% Table content
 %[2]s
-\end{longtable}`,
-		t.Title,
-		t.mergeRows().String(),
-		t.colTypesStr(),
+%[3]s`,
+		preamble, t.mergeRows().String(), postamble,
 	)
 }
 
@@ -174,6 +199,7 @@ func main() {
 	long := flag.Bool("long", false, "Use longtable instead of table and tabularx (recomended -s c)")
 	noFirstRowBold := flag.Bool("nb", false, "Do not bold first row.")
 	boldFirstColumn := flag.Bool("bc", false, "Bold first column.")
+	noPreamblePostamble := flag.Bool("npp", false, "Do not generate latex preamble and postamble. Will return only tble body. Ignores title. Useful to replace only the table body.")
 	flag.Parse()
 	glg.Debug("Parsed flags")
 
@@ -198,6 +224,8 @@ func main() {
 	interFormat.LongTable = *long
 	interFormat.BoldFirstRow = !*noFirstRowBold
 	interFormat.BoldFirstColumn = *boldFirstColumn
+	interFormat.NoPreamble = *noPreamblePostamble
+	interFormat.NoPostamble = *noPreamblePostamble
 
 	glg.Debug("Generating latex table")
 	latexTable := interFormat.EncodeLatexTable()

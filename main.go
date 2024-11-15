@@ -30,6 +30,7 @@ type Table struct {
 	LongTable       bool
 	NoPreamble      bool
 	NoPostamble     bool
+	Trim            bool
 }
 
 func NewTable() *Table {
@@ -152,6 +153,17 @@ func (t *Table) longTable() string {
 // rows returns a copy of t.Rows but with applied various modifiers from Table
 func (t *Table) rows() []Row {
 	rows := t.Rows
+
+	if t.Trim {
+		for i, cell := range rows[0] {
+			if cell == "" {
+				for j := 0; j < len(rows); j++ {
+					rows[j] = append(rows[j][:i], rows[j][i+1:]...)
+				}
+			}
+		}
+	}
+
 	if t.BoldFirstRow {
 		for i, cell := range rows[0] {
 			rows[0][i] = "\\textbf{" + cell + "}"
@@ -200,6 +212,7 @@ func main() {
 	noFirstRowBold := flag.Bool("nb", false, "Do not bold first row.")
 	boldFirstColumn := flag.Bool("bc", false, "Bold first column.")
 	noPreamblePostamble := flag.Bool("npp", false, "Do not generate latex preamble and postamble. Will return only tble body. Ignores title. Useful to replace only the table body.")
+	trim := flag.Bool("trim", false, "Trim empty columns (useful if you copy only some specified columns e.g. A and C) (NOTE: considers the first (header) row!)")
 	flag.Parse()
 	glg.Debug("Parsed flags")
 
@@ -226,6 +239,7 @@ func main() {
 	interFormat.BoldFirstColumn = *boldFirstColumn
 	interFormat.NoPreamble = *noPreamblePostamble
 	interFormat.NoPostamble = *noPreamblePostamble
+	interFormat.Trim = *trim
 
 	glg.Debug("Generating latex table")
 	latexTable := interFormat.EncodeLatexTable()

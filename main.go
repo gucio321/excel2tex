@@ -15,9 +15,11 @@ import (
 	"golang.design/x/clipboard"
 )
 
+const fingerprint = "%%excel2tex%%"
+
 func texHeader() string {
-	return fmt.Sprintf(`%%excel2tex%% Code generated with https://github.com/gucio321/excel2tex: %s`,
-		strings.Join(os.Args, " "))
+	return fmt.Sprintf(`%[1]s Code generated with https://github.com/gucio321/excel2tex: %s`,
+		fingerprint, strings.Join(os.Args, " "))
 }
 
 const (
@@ -224,6 +226,7 @@ func main() {
 	boldFirstColumn := flag.Bool("bc", false, "Bold first column.")
 	noPreamblePostamble := flag.Bool("npp", false, "Do not generate latex preamble and postamble. Will return only tble body. Ignores title. Useful to replace only the table body.")
 	trim := flag.Bool("trim", false, "Trim empty columns (useful if you copy only some specified columns e.g. A and C) (NOTE: considers the first (header) row!)")
+	force := flag.Bool("f", false, "Skip any data checks (when possible).")
 	flag.Parse()
 	glg.Debug("Parsed flags")
 
@@ -236,6 +239,14 @@ func main() {
 	glg.Debug("Reading excel table from clipboard")
 	excelTableData := clipboard.Read(clipboard.FmtText)
 	glg.Debugf("Got data from clipboard. %d bytes.", len(excelTableData))
+
+	glg.Debug("Validating excel data")
+	glg.Debug("Checking, if data aren't actually latex table")
+	if !*force {
+		if strings.HasPrefix(string(excelTableData), fingerprint) {
+			glg.Fatalf("Data from clipboard seems to be already latex table (copy again from excel). Use -f to force processing.")
+		}
+	}
 
 	interFormat, err := parseExcelInput(excelTableData)
 	if err != nil {

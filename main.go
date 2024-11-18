@@ -8,11 +8,17 @@ import (
 	"flag"
 	"fmt"
 	"io"
+	"os"
 	"strings"
 
 	"github.com/kpango/glg"
 	"golang.design/x/clipboard"
 )
+
+func texHeader() string {
+	return fmt.Sprintf(`%%excel2tex%% Code generated with https://github.com/gucio321/excel2tex: %s`,
+		strings.Join(os.Args, " "))
+}
 
 const (
 	DefaultTitle     = "XXXXX"
@@ -78,12 +84,13 @@ func (t *Table) normalTable() string {
 	colTypes += "|"
 
 	preamble := fmt.Sprintf(
-		`\begin{table}[ht]
-\caption{%[1]s}
+		`%[1]s
+\begin{table}[ht]
+\caption{%[2]s}
 \centering
- \begin{tabularx}{\textwidth}{%[2]s}
+ \begin{tabularx}{\textwidth}{%[3]s}
  \hline 
- `, t.Title, t.colTypesStr())
+ `, texHeader(), t.Title, t.colTypesStr())
 
 	postamble := `\end{tabularx}
 \end{table}`
@@ -106,8 +113,9 @@ func (t *Table) normalTable() string {
 
 // longTable encodes table with table and tabularx
 func (t *Table) longTable() string {
-	preamble := fmt.Sprintf(`\begin{longtable}{%[2]s} %% Column alignment and table borders
-\caption{%[1]s} \\
+	preamble := fmt.Sprintf(`%[1]s
+\begin{longtable}{%[3]s} %% Column alignment and table borders
+\caption{%[2]s} \\
 
 %% Header for the first page
 \hline
@@ -128,7 +136,7 @@ func (t *Table) longTable() string {
 %% Footer for the last page
 %%\hline
 %%\endlastfoot
-`, t.Title, t.colTypesStr())
+`, texHeader(), t.Title, t.colTypesStr())
 
 	postamble := `\end{longtable}`
 

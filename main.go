@@ -155,11 +155,14 @@ func (t *Table) rows() []Row {
 	rows := t.Rows
 
 	if t.Trim {
-		for i, cell := range rows[0] {
+		for i := 0; i < len(rows[0]); i++ {
+			cell := rows[0][i]
 			if cell == "" {
 				for j := 0; j < len(rows); j++ {
 					rows[j] = append(rows[j][:i], rows[j][i+1:]...)
 				}
+
+				i-- // we lose one column, so we want to recheck the same index
 			}
 		}
 	}

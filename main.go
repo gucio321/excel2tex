@@ -9,6 +9,7 @@ import (
 	"fmt"
 	"io"
 	"os"
+	"runtime/debug"
 	"strings"
 
 	"github.com/kpango/glg"
@@ -18,6 +19,15 @@ import (
 const fingerprint = "%%excel2tex%%"
 
 var commitHash string = "(unknown)"
+
+func init() {
+	buildInfo, ok := debug.ReadBuildInfo()
+	if !ok {
+		return
+	}
+
+	commitHash = buildInfo.Main.Version
+}
 
 func texHeader() string {
 	return fmt.Sprintf(`%[1]s Code generated with https://github.com/gucio321/excel2tex %s: %s`,

@@ -89,7 +89,7 @@ func (t *Table) normalTable() string {
 
 	preamble := fmt.Sprintf(
 		`%[1]s
-\begin{table}[ht]
+\begin{table}[H]
 \caption{%[2]s}
 \centering
  \begin{tabularx}{\textwidth}{%[3]s}

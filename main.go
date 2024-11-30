@@ -20,8 +20,8 @@ const fingerprint = "%%excel2tex%%"
 var commitHash string = "(unknown)"
 
 func texHeader() string {
-	return fmt.Sprintf(`%[1]s Code generated with https://github.com/gucio321/excel2tex: %s`,
-		fingerprint, strings.Join(os.Args, " "))
+	return fmt.Sprintf(`%[1]s Code generated with https://github.com/gucio321/excel2tex %s: %s`,
+		fingerprint, commitHash, strings.Join(os.Args, " "))
 }
 
 const (

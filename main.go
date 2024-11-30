@@ -229,8 +229,16 @@ func main() {
 	noPreamblePostamble := flag.Bool("npp", false, "Do not generate latex preamble and postamble. Will return only tble body. Ignores title. Useful to replace only the table body.")
 	trim := flag.Bool("trim", false, "Trim empty columns (useful if you copy only some specified columns e.g. A and C) (NOTE: considers the first (header) row!)")
 	force := flag.Bool("f", false, "Skip any data checks (when possible).")
+	version := flag.Bool("v", false, "Print version and exit")
+
 	flag.Parse()
+
 	glg.Debug("Parsed flags")
+
+	if *version {
+		fmt.Println(commitHash)
+		os.Exit(0)
+	}
 
 	if err := clipboard.Init(); err != nil {
 		glg.Fatalf("Error while initializing clipboard: %v", err)

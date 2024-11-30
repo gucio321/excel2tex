@@ -17,6 +17,8 @@ import (
 
 const fingerprint = "%%excel2tex%%"
 
+var commitHash string = "(unknown)"
+
 func texHeader() string {
 	return fmt.Sprintf(`%[1]s Code generated with https://github.com/gucio321/excel2tex: %s`,
 		fingerprint, strings.Join(os.Args, " "))
@@ -217,7 +219,7 @@ func (t *Table) colTypesStr() string {
 }
 
 func main() {
-	glg.Infof("Welcome to %s", glg.Cyan("excel2tex"))
+	glg.Infof("Welcome to %s %s", glg.Cyan("excel2tex"), glg.Yellow(commitHash))
 
 	title := flag.String("t", DefaultTitle, "Title of the table")
 	colType := flag.String("s", DefaultSeparator, "Separator for table columns (latex table columns type)")

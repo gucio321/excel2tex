@@ -20,8 +20,8 @@ jobs:
 
       - name: Build .bin and .exe package
         run: |
-          go build -v -o excel2tex.bin .
-          GOOS="windows" GOARCH="amd64" go build -v -o excel2tex.exe .
+          go build -ldflags="-X main.commitHash=`git rev-parse --short HEAD`" -v -o excel2tex.bin .
+          GOOS="windows" GOARCH="amd64" go build -ldflags="-X main.commitHash=`git re-vparse --short HEAD`" -v -o excel2tex.exe .
 
       - uses: "softprops/action-gh-release@v1"
         with:

@@ -236,7 +236,7 @@ func (t *Table) label() string {
 		return ""
 	}
 
-	return fmt.Sprintf("\\label{%s}", t.Label)
+	return fmt.Sprintf("\\label{tbl:%s}", t.Label)
 }
 
 func main() {

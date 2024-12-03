@@ -132,7 +132,7 @@ func (t *Table) longTable() string {
 	preamble := fmt.Sprintf(`%[1]s
 \begin{longtable}{%[3]s} %% Column alignment and table borders
 \caption{%[2]s} 
-%[3]s \\
+%[4]s \\
 
 %% Header for the first page
 \hline

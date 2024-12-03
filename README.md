@@ -16,19 +16,25 @@ Optionally to get latest code do `go install github.com/gucio321/excel2tex/v2@la
 ## Command Line Arguments
 
 ```console
-$ excel2tex -h
-2024-11-10 17:04:09	[INFO]:	Welcome to excel2tex
 Usage of excel2tex:
   -bc
     	Bold first column.
+  -f	Skip any data checks (when possible).
+  -l string
+    	Label for the table
   -long
     	Use longtable instead of table and tabularx (recomended -s c)
   -nb
     	Do not bold first row.
+  -npp
+    	Do not generate latex preamble and postamble. Will return only tble body. Ignores title. Useful to replace only the table body.
   -s string
     	Separator for table columns (latex table columns type) (default "X")
   -t string
     	Title of the table (default "XXXXX")
+  -trim
+    	Trim empty columns (useful if you copy only some specified columns e.g. A and C) (NOTE: considers the first (header) row!)
+  -v	Print version and exit
 ```
 
 # Legal Notes

@@ -51,6 +51,7 @@ type Table struct {
 	NoPreamble      bool
 	NoPostamble     bool
 	Trim            bool
+	Label           string
 }
 
 func NewTable() *Table {
@@ -101,10 +102,11 @@ func (t *Table) normalTable() string {
 		`%[1]s
 \begin{table}[H]
 \caption{%[2]s}
+%[4]s
 \centering
  \begin{tabularx}{\textwidth}{%[3]s}
  \hline 
- `, texHeader(), t.Title, t.colTypesStr())
+ `, texHeader(), t.Title, t.colTypesStr(), t.label())
 
 	postamble := `\end{tabularx}
 \end{table}`
@@ -129,7 +131,8 @@ func (t *Table) normalTable() string {
 func (t *Table) longTable() string {
 	preamble := fmt.Sprintf(`%[1]s
 \begin{longtable}{%[3]s} %% Column alignment and table borders
-\caption{%[2]s} \\
+\caption{%[2]s} 
+%[3]s \\
 
 %% Header for the first page
 \hline
@@ -150,7 +153,7 @@ func (t *Table) longTable() string {
 %% Footer for the last page
 %%\hline
 %%\endlastfoot
-`, texHeader(), t.Title, t.colTypesStr())
+`, texHeader(), t.Title, t.colTypesStr(), t.label())
 
 	postamble := `\end{longtable}`
 
@@ -228,6 +231,14 @@ func (t *Table) colTypesStr() string {
 	return colTypes
 }
 
+func (t *Table) label() string {
+	if t.Label == "" {
+		return ""
+	}
+
+	return fmt.Sprintf("\\label{%s}", t.Label)
+}
+
 func main() {
 	glg.Infof("Welcome to %s %s", glg.Cyan("excel2tex"), glg.Yellow(commitHash))
 
@@ -240,6 +251,7 @@ func main() {
 	trim := flag.Bool("trim", false, "Trim empty columns (useful if you copy only some specified columns e.g. A and C) (NOTE: considers the first (header) row!)")
 	force := flag.Bool("f", false, "Skip any data checks (when possible).")
 	version := flag.Bool("v", false, "Print version and exit")
+	label := flag.String("l", "", "Label for the table")
 
 	flag.Parse()
 
@@ -282,6 +294,7 @@ func main() {
 	interFormat.NoPreamble = *noPreamblePostamble
 	interFormat.NoPostamble = *noPreamblePostamble
 	interFormat.Trim = *trim
+	interFormat.Label = *label
 
 	glg.Debug("Generating latex table")
 	latexTable := interFormat.EncodeLatexTable()

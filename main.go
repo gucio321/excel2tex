@@ -133,26 +133,12 @@ func (t *Table) longTable() string {
 \begin{longtable}{%[3]s} %% Column alignment and table borders
 \caption{%[2]s} 
 %[4]s \\
-
 %% Header for the first page
-\hline
-%%\multicolumn{3}{|c|}{Table Header} \\
-%%\hline
-\endfirsthead
-
+\hline \endfirsthead
 %% Header for subsequent pages
-\hline
-%%\multicolumn{3}{|c|}{Table Header (continued)} \\
-%%\hline
-\endhead
-
+\hline \endhead
 %% Footer for each page
 \hline
-%%\endfoot
-
-%% Footer for the last page
-%%\hline
-%%\endlastfoot
 `, texHeader(), t.Title, t.colTypesStr(), t.label())
 
 	postamble := `\end{longtable}`

@@ -36,7 +36,7 @@ func texHeader() string {
 
 const (
 	DefaultTitle     = "XXXXX"
-	DefaultSeparator = "X"
+	DefaultSeparator = "c"
 )
 
 type Row []string
@@ -244,7 +244,8 @@ func main() {
 
 	title := flag.String("t", DefaultTitle, "Title of the table")
 	colType := flag.String("s", DefaultSeparator, "Separator for table columns (latex table columns type)")
-	long := flag.Bool("long", false, "Use longtable instead of table and tabularx (recomended -s c)")
+	long := flag.Bool("long", false, "[DEPRECATED] Use longtable instead of table and tabularx (recomended -s c) (default since v2.7.0)")
+	legacy := flag.Bool("legacy", false, "Use tabularx instead of longtable. (-s X recomended)")
 	noFirstRowBold := flag.Bool("nb", false, "Do not bold first row.")
 	boldFirstColumn := flag.Bool("bc", false, "Bold first column.")
 	noPreamblePostamble := flag.Bool("npp", false, "Do not generate latex preamble and postamble. Will return only tble body. Ignores title. Useful to replace only the table body.")
@@ -260,6 +261,10 @@ func main() {
 	if *version {
 		fmt.Println(commitHash)
 		os.Exit(0)
+	}
+
+	if *long {
+		glg.Warn("Flag -long is deprecated and will be removed in the future. Longtable is default now. Use -legacy for tabularx syntax.")
 	}
 
 	if err := clipboard.Init(); err != nil {
@@ -288,7 +293,7 @@ func main() {
 	glg.Debug("Setting properties for internally-processed table")
 	interFormat.Title = *title
 	interFormat.LatexColumnType = *colType
-	interFormat.LongTable = *long
+	interFormat.LongTable = !*legacy
 	interFormat.BoldFirstRow = !*noFirstRowBold
 	interFormat.BoldFirstColumn = *boldFirstColumn
 	interFormat.NoPreamble = *noPreamblePostamble

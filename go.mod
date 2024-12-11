@@ -1,4 +1,4 @@
-module github.com/gucio321/excel2tex/v2
+module github.com/gucio321/excel2tex/v3
 
 go 1.23.1
 

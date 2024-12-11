@@ -16,25 +16,22 @@ Optionally to get latest code do `go install github.com/gucio321/excel2tex/v2@la
 ## Command Line Arguments
 
 ```console
-Usage of excel2tex:
-  -bc
-    	Bold first column.
-  -f	Skip any data checks (when possible).
-  -l string
-    	Label for the table
-  -long
-    	Use longtable instead of table and tabularx (recomended -s c)
-  -nb
-    	Do not bold first row.
-  -npp
-    	Do not generate latex preamble and postamble. Will return only tble body. Ignores title. Useful to replace only the table body.
-  -s string
-    	Separator for table columns (latex table columns type) (default "X")
-  -t string
-    	Title of the table (default "XXXXX")
-  -trim
-    	Trim empty columns (useful if you copy only some specified columns e.g. A and C) (NOTE: considers the first (header) row!)
-  -v	Print version and exit
+[INFO]:	Welcome to excel2tex v3.0.0
+Usage: excel2tex [FLAG]...
+
+Flags:
+    -T, --title                 Title of the table                                                                                                                                                   (type: string; default: XXXXX)
+    -l, --label                 Label for the table                                                                                                                                                  (type: string)
+    -t, --trim                  Trim empty columns (useful if you copy only some specified columns e.g. A and C) (NOTE: considers the first (header) row only!)                                      (type: bool; default: false)
+    -nb, --no-header-bold       Do not bold first row (header)                                                                                                                                       (type: bool; default: false)
+    -bc, --bold-first-column    Bold first column                                                                                                                                                    (type: bool; default: false)
+    -npp, -do --data-only       Do not generate latex preamble and postamble. Will return only tble body. Ignores title, label, column type, table type e.t.c. Useful for introducing data fixes.    (type: bool; default: false)
+    -s                          Separator for table columns (latex table columns type)                                                                                                               (type: string; default: c)
+    -legacy                     Use tabularx instead of longtable. (-s X recomended)                                                                                                                 (type: bool; default: false)
+    -f, --force                 Skip any data checks (when possible).                                                                                                                                (type: bool; default: false)
+    -v, --version               Print version and exit                                                                                                                                               (type: bool; default: false)
+    -h, --help                  show help                                                                                                                                                            (type: bool)
+
 ```
 
 # Legal Notes

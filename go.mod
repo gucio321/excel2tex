@@ -3,6 +3,7 @@ module github.com/gucio321/excel2tex/v2
 go 1.23.1
 
 require (
+	github.com/cosiner/flag v0.5.2
 	github.com/kpango/glg v1.6.15
 	golang.design/x/clipboard v0.7.0
 )

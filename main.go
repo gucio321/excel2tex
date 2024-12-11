@@ -5,18 +5,22 @@ import (
 	"context"
 	"encoding/csv"
 	"errors"
-	"flag"
 	"fmt"
 	"io"
 	"os"
 	"runtime/debug"
 	"strings"
 
+	"github.com/cosiner/flag"
 	"github.com/kpango/glg"
 	"golang.design/x/clipboard"
 )
 
-const fingerprint = "%%excel2tex%%"
+const (
+	fingerprint      = "%%excel2tex%%"
+	DefaultTitle     = "XXXXX"
+	DefaultSeparator = "c"
+)
 
 var commitHash string = "(unknown)"
 
@@ -33,11 +37,6 @@ func texHeader() string {
 	return fmt.Sprintf(`%[1]s Code generated with https://github.com/gucio321/excel2tex %s: %s`,
 		fingerprint, commitHash, strings.Join(os.Args, " "))
 }
-
-const (
-	DefaultTitle     = "XXXXX"
-	DefaultSeparator = "c"
-)
 
 type Row []string
 
@@ -239,31 +238,40 @@ func (t *Table) label() string {
 	return fmt.Sprintf("\\label{tbl:%s}", t.Label)
 }
 
+type flags struct {
+	Title string `names:"-T, --title" usage:"Title of the table" default:"XXXXX"`
+	Label string `names:"-l, --label" usage:"Label for the table"`
+	Trim  bool   `names:"-t, --trim" usage:"Trim empty columns (useful if you copy only some specified columns e.g. A and C) (NOTE: considers the first (header) row only!)" default:"false"`
+
+	NoFirstRowBold      bool `names:"-nb, --no-header-bold" usage:"Do not bold first row (header)" default:"false"`
+	BoldFirstColumn     bool `names:"-bc, --bold-first-column" usage:"Bold first column" default:"false"`
+	NoPreamblePostamble bool `names:"-npp, -do --data-only" usage:"Do not generate latex preamble and postamble. Will return only tble body. Ignores title, label, column type, table type e.t.c. Useful for introducing data fixes." default:"false"`
+
+	ColType string `names:"-s" usage:"Separator for table columns (latex table columns type)" default:"c"`
+
+	Long   bool `names:"--long" usage:"[DEPRECATED] Use longtable instead of table and tabularx (recomended -s c) (default since v2.7.0)" default:"false"`
+	Legacy bool `name:"--legacy" usage:"Use tabularx instead of longtable. (-s X recomended)" default:"false"`
+
+	Force bool `names:"-f, --force" usage:"Skip any data checks (when possible)." default:"false"`
+
+	Version bool `names:"-v, --version" usage:"Print version and exit" default:"false"`
+}
+
 func main() {
 	glg.Infof("Welcome to %s %s", glg.Cyan("excel2tex"), glg.Yellow(commitHash))
 
-	title := flag.String("t", DefaultTitle, "Title of the table")
-	colType := flag.String("s", DefaultSeparator, "Separator for table columns (latex table columns type)")
-	long := flag.Bool("long", false, "[DEPRECATED] Use longtable instead of table and tabularx (recomended -s c) (default since v2.7.0)")
-	legacy := flag.Bool("legacy", false, "Use tabularx instead of longtable. (-s X recomended)")
-	noFirstRowBold := flag.Bool("nb", false, "Do not bold first row.")
-	boldFirstColumn := flag.Bool("bc", false, "Bold first column.")
-	noPreamblePostamble := flag.Bool("npp", false, "Do not generate latex preamble and postamble. Will return only tble body. Ignores title. Useful to replace only the table body.")
-	trim := flag.Bool("trim", false, "Trim empty columns (useful if you copy only some specified columns e.g. A and C) (NOTE: considers the first (header) row!)")
-	force := flag.Bool("f", false, "Skip any data checks (when possible).")
-	version := flag.Bool("v", false, "Print version and exit")
-	label := flag.String("l", "", "Label for the table")
+	var f flags
 
-	flag.Parse()
+	flag.ParseStruct(&f)
 
 	glg.Debug("Parsed flags")
 
-	if *version {
+	if f.Version {
 		fmt.Println(commitHash)
 		os.Exit(0)
 	}
 
-	if *long {
+	if f.Long {
 		glg.Warn("Flag -long is deprecated and will be removed in the future. Longtable is default now. Use -legacy for tabularx syntax.")
 	}
 
@@ -279,7 +287,7 @@ func main() {
 
 	glg.Debug("Validating excel data")
 	glg.Debug("Checking, if data aren't actually latex table")
-	if !*force {
+	if !f.Force {
 		if strings.HasPrefix(string(excelTableData), fingerprint) {
 			glg.Fatalf("Data from clipboard seems to be already latex table (copy again from excel). Use -f to force processing.")
 		}
@@ -291,15 +299,15 @@ func main() {
 	}
 
 	glg.Debug("Setting properties for internally-processed table")
-	interFormat.Title = *title
-	interFormat.LatexColumnType = *colType
-	interFormat.LongTable = !*legacy
-	interFormat.BoldFirstRow = !*noFirstRowBold
-	interFormat.BoldFirstColumn = *boldFirstColumn
-	interFormat.NoPreamble = *noPreamblePostamble
-	interFormat.NoPostamble = *noPreamblePostamble
-	interFormat.Trim = *trim
-	interFormat.Label = *label
+	interFormat.Title = f.Title
+	interFormat.LatexColumnType = f.ColType
+	interFormat.LongTable = !f.Legacy
+	interFormat.BoldFirstRow = !f.NoFirstRowBold
+	interFormat.BoldFirstColumn = f.BoldFirstColumn
+	interFormat.NoPreamble = f.NoPreamblePostamble
+	interFormat.NoPostamble = f.NoPreamblePostamble
+	interFormat.Trim = f.Trim
+	interFormat.Label = f.Label
 
 	glg.Debug("Generating latex table")
 	latexTable := interFormat.EncodeLatexTable()

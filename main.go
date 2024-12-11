@@ -235,7 +235,6 @@ type flags struct {
 
 	ColType string `names:"-s" usage:"Separator for table columns (latex table columns type)" default:"c"`
 
-	Long   bool `names:"--long" usage:"[DEPRECATED] Use longtable instead of table and tabularx (recomended -s c) (default since v2.7.0)" default:"false"`
 	Legacy bool `name:"--legacy" usage:"Use tabularx instead of longtable. (-s X recomended)" default:"false"`
 
 	Force bool `names:"-f, --force" usage:"Skip any data checks (when possible)." default:"false"`
@@ -255,10 +254,6 @@ func main() {
 	if f.Version {
 		fmt.Println(commitHash)
 		os.Exit(0)
-	}
-
-	if f.Long {
-		glg.Warn("Flag -long is deprecated and will be removed in the future. Longtable is default now. Use -legacy for tabularx syntax.")
 	}
 
 	if err := clipboard.Init(); err != nil {

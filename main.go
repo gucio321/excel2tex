@@ -85,11 +85,12 @@ CSSRead:
 }
 
 func (t *Table) EncodeLatexTable() string {
+	result := t.normalTable()
 	if t.LongTable {
-		return t.longTable()
+		result = t.longTable()
 	}
 
-	return t.normalTable()
+	return strings.ReplaceAll(result, "\n\n", "\n")
 }
 
 // normalTable encodes table with table and tabularx
@@ -118,8 +119,7 @@ func (t *Table) normalTable() string {
 
 	return fmt.Sprintf(
 		`%[1]s
-%[2]s
-%[3]s`,
+		%[2]s %[3]s`,
 		preamble, t.mergeRows().String(), postamble,
 	)
 }
@@ -152,8 +152,7 @@ func (t *Table) longTable() string {
 		`
 %[1]s
 %% Table content
-%[2]s
-%[3]s`,
+%[2]s %[3]s`,
 		preamble, t.mergeRows().String(), postamble,
 	)
 }

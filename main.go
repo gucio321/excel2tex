@@ -85,9 +85,11 @@ CSSRead:
 }
 
 func (t *Table) EncodeLatexTable() string {
-	result := t.normalTable()
+	var result string
 	if t.LongTable {
 		result = t.longTable()
+	} else {
+		result = t.normalTable()
 	}
 
 	return strings.ReplaceAll(result, "\n\n", "\n")

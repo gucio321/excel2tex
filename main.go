@@ -85,11 +85,14 @@ CSSRead:
 }
 
 func (t *Table) EncodeLatexTable() string {
+	var result string
 	if t.LongTable {
-		return t.longTable()
+		result = t.longTable()
+	} else {
+		result = t.normalTable()
 	}
 
-	return t.normalTable()
+	return strings.ReplaceAll(result, "\n\n", "\n")
 }
 
 // normalTable encodes table with table and tabularx
@@ -100,12 +103,10 @@ func (t *Table) normalTable() string {
 	preamble := fmt.Sprintf(
 		`%[1]s
 \begin{table}[H]
-\caption{%[2]s}
-%[4]s
+\caption{%[2]s} %[4]s
 \centering
  \begin{tabularx}{\textwidth}{%[3]s}
- \hline 
- `, texHeader(), t.Title, t.colTypesStr(), t.label())
+ \hline `, texHeader(), t.Title, t.colTypesStr(), t.label())
 
 	postamble := `\end{tabularx}
 \end{table}`
@@ -120,8 +121,7 @@ func (t *Table) normalTable() string {
 
 	return fmt.Sprintf(
 		`%[1]s
-%[2]s
-%[3]s`,
+		%[2]s %[3]s`,
 		preamble, t.mergeRows().String(), postamble,
 	)
 }
@@ -130,15 +130,15 @@ func (t *Table) normalTable() string {
 func (t *Table) longTable() string {
 	preamble := fmt.Sprintf(`%[1]s
 \begin{longtable}{%[3]s} %% Column alignment and table borders
-\caption{%[2]s} 
-%[4]s \\
-%% Header for the first page
-\hline \endfirsthead
-%% Header for subsequent pages
-\hline \endhead
-%% Footer for each page
-\hline
-`, texHeader(), t.Title, t.colTypesStr(), t.label())
+\caption{%[2]s} %[4]s \\
+\hline \endfirsthead %% Header for the first page
+\hline \endhead %% Header for subsequent pages
+\hline %% Footer for each page`,
+		texHeader(),
+		t.Title,
+		t.colTypesStr(),
+		t.label(),
+	)
 
 	postamble := `\end{longtable}`
 
@@ -154,8 +154,7 @@ func (t *Table) longTable() string {
 		`
 %[1]s
 %% Table content
-%[2]s
-%[3]s`,
+%[2]s %[3]s`,
 		preamble, t.mergeRows().String(), postamble,
 	)
 }

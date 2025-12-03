@@ -182,6 +182,23 @@ func (t *Table) rows() []Row {
 		}
 	}
 
+	if t.Trim {
+		for i := 0; i < len(rows); i++ {
+			isEmpty := true
+			for _, c := range rows[i] {
+				if c != "" {
+					isEmpty = false
+					break
+				}
+			}
+
+			if isEmpty {
+				rows = append(rows[:i], rows[i+1:]...)
+				i-- // we lose one row, so we want to recheck the same index
+			}
+		}
+	}
+
 	if t.BoldFirstColumn {
 		for i := 0; i < len(rows); i++ {
 			rows[i][0] = "\\textbf{" + rows[i][0] + "}"

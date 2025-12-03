@@ -268,8 +268,10 @@ func main() {
 	glg.Debug("Validating excel data")
 	glg.Debug("Checking, if data aren't actually latex table")
 	if !f.Force {
-		if strings.HasPrefix(string(excelTableData), fingerprint) {
-			glg.Fatalf("Data from clipboard seems to be already latex table (copy again from excel). Use -f to force processing.")
+		// for some reason, \n is inserted at the beginning (probably by the clipboard)
+		if strings.HasPrefix(string(excelTableData), "\n"+fingerprint) {
+			glg.Error("Data from clipboard seems to already be a excel2tex table (copy again from excel or use -f to baypass this).")
+			os.Exit(1)
 		}
 	}
 

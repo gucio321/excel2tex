@@ -297,6 +297,10 @@ func main() {
 		glg.Fatalf("Error while parsing excel data: %v", err)
 	}
 
+	if !f.Force && len(interFormat.Rows) == 0 {
+		glg.Fatal("No data found. Did you copy from excel? Use --help for details.")
+	}
+
 	glg.Debug("Setting properties for internally-processed table")
 	interFormat.Title = f.Title
 	interFormat.LatexColumnType = f.ColType
